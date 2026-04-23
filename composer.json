@@ -1,0 +1,20 @@
+{
+    "name": "chrono-meter/wp-scoper-scripts",
+    "version": "1.0.0",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "ChronoMeter\\WpScoperScripts\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "chrono-meter",
+            "email": "chrono-meter@gmx.net"
+        }
+    ],
+    "require": {
+        "symfony/filesystem": "^8.0"
+    }
+}
