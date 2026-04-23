@@ -1,5 +1,6 @@
 {
     "name": "chrono-meter/wp-scoper-scripts",
+    "description": "A helper library to run php-scoper for WordPress plugins.",
     "version": "1.0.0",
     "type": "library",
     "license": "MIT",
@@ -15,6 +16,7 @@
         }
     ],
     "require": {
+        "php": "^8.2",
         "symfony/filesystem": "^8.0"
     }
 }
