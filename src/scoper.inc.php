@@ -71,7 +71,7 @@ function getComposerInstalledPackageDirs() {
 			||
 			$root_package['name'] === $package_name
 			||
-			$package_data['dev_requirement'] ?? false
+			( $package_data['dev_requirement'] ?? false )
 			||
 			empty( $package_data['install_path'] )
 		) {
