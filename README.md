@@ -11,12 +11,12 @@ A Composer plugin that automates PHP namespace prefixing for WordPress plugins u
         // dependencies...
     },
     "require-dev": {
-        "chrono-meter/wp-scoper-scripts": "dev-master"
+        "chrono-meter/composer-plugin-for-wp": "dev-master"
     },
     "config": {
         "vendor-dir": "third-party.tmp",
         "allow-plugins": {
-            "chrono-meter/wp-scoper-scripts": true
+            "chrono-meter/composer-plugin-for-wp": true
         }
     },
     "extra": {
@@ -31,7 +31,7 @@ A Composer plugin that automates PHP namespace prefixing for WordPress plugins u
             /**
              * Relative path for Scoper installation directory.
              *
-             * @default "./php-scoper.tmp"
+             * @default "/tmp/phpscoper-PROJECTPATHHASH.tmp"
              */
             "work-dir": "",
 

@@ -1,7 +1,7 @@
 {
     "name": "chrono-meter/composer-plugin-for-wp",
     "description": "Composer plugin for WordPress plugins and themes.",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "type": "composer-plugin",
     "license": "MIT",
     "autoload": {
