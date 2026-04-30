@@ -1,25 +1,57 @@
 <?php  // phpcs:ignore
-namespace ChronoMeter\WpScoperScripts;
+namespace ChronoMeter\ComposerPluginForWp;
+use Composer\Composer;
+use Composer\Config;
+use Composer\IO\IOInterface;
+use Composer\Plugin\PluginInterface;
+use Composer\EventDispatcher\EventSubscriberInterface;
+use Composer\Script\Event;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Filesystem\Filesystem;
 
-// phpcs:disable Squiz.Commenting, Squiz.PHP.CommentedOutCode, WordPress
+// phpcs:disable Squiz.Commenting, Squiz.PHP.CommentedOutCode, Universal.Operators.DisallowShortTernary.Found, WordPress
 
 
-class Script {
-	public static function run( \Composer\Script\Event $event ): void {
+class Plugin implements PluginInterface, EventSubscriberInterface {
+
+	public function activate( Composer $composer, IOInterface $io ) {
+	}
+
+	public function deactivate( Composer $composer, IOInterface $io ) {
+	}
+
+	public function uninstall( Composer $composer, IOInterface $io ) {
+	}
+
+	public static function getSubscribedEvents() {
+		return array(
+			'post-install-cmd' => 'run',
+			'post-update-cmd' => 'run',
+		);
+	}
+
+	public static function run( Event $event ) {
 		$filesystem = new Filesystem();
+		$composer   = $event->getComposer();
 		$io         = $event->getIO();
-		$args       = $event->getArguments();
 
-		$project_dir = getcwd();
+		$vendor_dir = $composer->getConfig()->get( 'vendor-dir', Config::RELATIVE_PATHS );
+		$conf       = $composer->getPackage()->getExtra()['scoper'] ?? array();
 
-		// Parse "composer.json" in $project_dir.
-		$composer_conf = json_decode( file_get_contents( Path::join( $project_dir, 'composer.json' ) ), true ) ?? array();
-		$conf          = $composer_conf['extra']['scoper'] ?? array();
+		$project_dir = $composer->getConfig()->get( 'vendor-dir' );
+		if (str_ends_with( $project_dir, '/' . $vendor_dir )) {
+			$project_dir = substr( $project_dir, 0, -strlen( '/' . $vendor_dir ) );
+		} else {
+			throw new \RuntimeException( 'Failed to determine project directory.' );
+		}
 
-		$workdir = Path::join( $project_dir, $conf['workdir'] ?? 'php-scoper.tmp' );
-		$outdir  = Path::join( $project_dir, $conf['outdir'] ?? 'third-party' );
+		$io->write( 'Running php-scoper for WordPress plugin dependencies...' );
+
+		$workdir = empty( $conf['work-dir'] )
+			? Path::join( sys_get_temp_dir(), 'phpscoper-' . hash( 'md5', $project_dir ) . '.tmp' )
+			: Path::join( $project_dir, $conf['work-dir'] );
+
+		$outdir = Path::join( $project_dir, $conf['out-dir'] ?? 'third-party' );
 
 		$io->write( 'Setup php-scoper in ' . $workdir );
 		if ( $workdir ) {
@@ -41,7 +73,14 @@ EOD
 			);
 
 			// Run: @composer --working-dir=php-scoper update --no-interaction
-			static::execute_command( 'composer update --no-interaction', cwd: $workdir );
+			static::execute_command(
+				'composer update --no-interaction',
+				cwd: $workdir,
+				env_vars: array(
+					...getenv(),
+					'COMPOSER' => 'composer.json',
+				),
+			);
 		}
 
 		// Find "scoper.inc.php" then run: php php-scoper/vendor/humbug/php-scoper/bin/php-scoper add --output-dir=./third-party --force --quiet
@@ -68,7 +107,7 @@ EOD
 
 		} else {
 			$scoper_inc_path = Path::join( __DIR__, 'scoper.inc.php' );
-			$prefix          = $conf['prefix'] ?? array_key_first( $composer_conf['autoload']['psr-4'] ?? array() ) ?? '';
+			$prefix          = $conf['prefix'] ?? array_key_first( $composer->getPackage()->getAutoload()['psr-4'] ?? array() ) ?? '';
 			$prefix          = rtrim( $prefix, '\\' );
 
 			if ( empty( $prefix ) ) {
@@ -79,16 +118,25 @@ EOD
 				array( ...$command, "--config=$scoper_inc_path" ),
 				cwd: $project_dir,
 				env_vars: array(
-				'SCOPER_PREFIX' => $prefix,
-				'SCOPER_WORKDIR' => $workdir,
-				)
+					...getenv(),
+					'SCOPER_PREFIX' => $prefix,
+					'SCOPER_WORKDIR' => $workdir,
+					'COMPOSER_VENDOR_DIR' => $vendor_dir,
+				),
 			);
 		}
 
 		$io->write( 'Generate "autoload_classmap.php"...' );
 		if ( is_dir( $outdir ) ) {
 			file_put_contents( Path::join( $outdir, 'composer.json' ), '{ "autoload": { "classmap": [""] } }' );
-			static::execute_command( "composer --working-dir=$outdir dump-autoload --classmap-authoritative --no-dev --no-interaction", cwd: $project_dir );
+			static::execute_command(
+				"composer --working-dir=$outdir dump-autoload --classmap-authoritative --no-dev --no-interaction",
+				cwd: $project_dir,
+				env_vars: array(
+					...getenv(),
+					'COMPOSER' => 'composer.json',
+				),
+			);
 			unlink( Path::join( $outdir, 'composer.json' ) );
 		}
 	}

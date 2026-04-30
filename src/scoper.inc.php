@@ -13,8 +13,14 @@ use Isolated\Symfony\Component\Finder\Finder;
 use Symfony\Component\Filesystem\Path;
 
 
-if ( ! getenv( 'SCOPER_WORKDIR' ) || ! getenv( 'SCOPER_PREFIX' ) ) {
-	throw new \RuntimeException( 'SCOPER_WORKDIR or SCOPER_PREFIX environment variable is not set.' );
+if ( ! getenv( 'SCOPER_WORKDIR' ) ) {
+	throw new \RuntimeException( 'SCOPER_WORKDIR environment variable is not set.' );
+}
+if ( ! getenv( 'SCOPER_PREFIX' ) ) {
+	throw new \RuntimeException( 'SCOPER_PREFIX environment variable is not set.' );
+}
+if ( ! getenv( 'COMPOSER_VENDOR_DIR' ) ) {
+	throw new \RuntimeException( 'COMPOSER_VENDOR_DIR environment variable is not set.' );
 }
 
 
@@ -60,7 +66,7 @@ class FinderWithNoRealPath extends Finder {
 
 
 function getComposerInstalledPackageDirs() {
-	$data         = ( require './vendor/composer/installed.php' );
+	$data         = ( require Path::join( getenv( 'COMPOSER_VENDOR_DIR' ), 'composer/installed.php' ) );
 	$root_package = $data['root'] ?? array();
 
 	$result = array();
@@ -90,7 +96,7 @@ return array(
 	'finders'           => array(
 		FinderWithNoRealPath::create()
 			->files()
-			->in( array( 'vendor', ...getComposerInstalledPackageDirs() ) )
+			->in( array( getenv( 'COMPOSER_VENDOR_DIR' ), ...getComposerInstalledPackageDirs() ) )
 			->ignoreVCS( true ),
 	),
 	'exclude-classes'   => getWpExcludedSymbols( 'exclude-wordpress-classes.json' ),

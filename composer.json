@@ -1,12 +1,12 @@
 {
-    "name": "chrono-meter/wp-scoper-scripts",
-    "description": "A helper library to run php-scoper for WordPress plugins.",
-    "version": "1.0.0",
-    "type": "library",
+    "name": "chrono-meter/composer-plugin-for-wp",
+    "description": "Composer plugin for WordPress plugins and themes.",
+    "version": "1.1.0",
+    "type": "composer-plugin",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "ChronoMeter\\WpScoperScripts\\": "src/"
+            "ChronoMeter\\ComposerPluginForWp\\": "src/"
         }
     },
     "authors": [
@@ -17,6 +17,13 @@
     ],
     "require": {
         "php": "^8.2",
+        "composer-plugin-api": "^2.0",
         "symfony/filesystem": "^8.0"
+    },
+    "require-dev": {
+        "composer/composer": "^2.0"
+    },
+    "extra": {
+        "class": "ChronoMeter\\ComposerPluginForWp\\Plugin"
     }
 }

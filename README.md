@@ -1,31 +1,23 @@
-# wp-scoper-scripts
+# composer-plugin-for-wp
 
-A Composer script package that automates PHP namespace prefixing for WordPress plugins using PHP Scoper. Easy integration with existing WordPress plugins.
+A Composer plugin that automates PHP namespace prefixing for WordPress plugins using PHP Scoper. Easy integration with existing WordPress plugins.
 
 
-# `composer.json`
+# `third-party.json`
 
 ```json
 {
-    "autoload": {
-        "psr-4": {
-            "VendorName\\Package\\": "src/"
-        }
+    "require": {
+        // dependencies...
     },
     "require-dev": {
         "chrono-meter/wp-scoper-scripts": "dev-master"
     },
-    "scripts": {
-        "post-install-cmd": [
-            "@prefix-dependencies"
-        ],
-        "post-update-cmd": [
-            "@prefix-dependencies"
-        ],
-        "prefix-dependencies": [
-            "Composer\\Config::disableProcessTimeout",
-            "ChronoMeter\\WpScoperScripts\\Script::run"
-        ]
+    "config": {
+        "vendor-dir": "third-party.tmp",
+        "allow-plugins": {
+            "chrono-meter/wp-scoper-scripts": true
+        }
     },
     "extra": {
         "scoper": {
@@ -41,14 +33,14 @@ A Composer script package that automates PHP namespace prefixing for WordPress p
              *
              * @default "./php-scoper.tmp"
              */
-            "workdir": "",
+            "work-dir": "",
 
             /**
              * Relative path for output (prefix-ed packages) directory.
              *
              * @default "./third-party"
              */
-            "outdir": "",
+            "out-dir": "",
 
             /**
              * Relative path for custom "scoper.inc.php" file.
@@ -61,8 +53,13 @@ A Composer script package that automates PHP namespace prefixing for WordPress p
 }
 ```
 
+Run:
 
-# Then load
+```sh
+COMPOSER=third-party.json composer update
+```
+
+Then load:
 
 ```php
 require_once __DIR__ . '/third-party/vendor/autoload.php';
