@@ -22,6 +22,9 @@ if ( ! getenv( 'SCOPER_PREFIX' ) ) {
 if ( ! getenv( 'COMPOSER_VENDOR_DIR' ) ) {
 	throw new \RuntimeException( 'COMPOSER_VENDOR_DIR environment variable is not set.' );
 }
+if ( ! getenv( 'THIRD_PARTY_CONFIG' ) ) {
+	throw new \RuntimeException( 'THIRD_PARTY_CONFIG environment variable is not set.' );
+}
 
 
 /**
@@ -29,6 +32,7 @@ if ( ! getenv( 'COMPOSER_VENDOR_DIR' ) ) {
  *
  * @param string $file_name The file name.
  * @link https://github.com/humbug/php-scoper/blob/main/docs/further-reading.md#wordpress-support
+ * @link https://github.com/snicco/php-scoper-wordpress-excludes/tree/master/generated
  */
 function getWpExcludedSymbols( string $file_name ): array {  // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.FunctionNameInvalid
 	$path = getenv( 'SCOPER_WORKDIR' ) . '/vendor/sniccowp/php-scoper-wordpress-excludes/generated/' . $file_name;
@@ -91,6 +95,10 @@ function getComposerInstalledPackageDirs() {
 }
 
 
+$conf = json_decode( file_get_contents( getenv( 'THIRD_PARTY_CONFIG' ) ), true );
+
+
+// https://github.com/humbug/php-scoper/blob/main/docs/configuration.md
 return array(
 	'prefix'            => getenv( 'SCOPER_PREFIX' ),
 	'finders'           => array(
@@ -99,7 +107,28 @@ return array(
 			->in( array( getenv( 'COMPOSER_VENDOR_DIR' ), ...getComposerInstalledPackageDirs() ) )
 			->ignoreVCS( true ),
 	),
-	'exclude-classes'   => getWpExcludedSymbols( 'exclude-wordpress-classes.json' ),
-	'exclude-constants' => getWpExcludedSymbols( 'exclude-wordpress-functions.json' ),
-	'exclude-functions' => getWpExcludedSymbols( 'exclude-wordpress-constants.json' ),
+
+	'exclude-files' => $conf['exclude-files'] ?? array(),
+	'exclude-namespaces' => $conf['exclude-namespaces'] ?? array(),
+	'exclude-constants' => array(
+		...getWpExcludedSymbols( 'exclude-wordpress-functions.json' ),
+		...$conf['exclude-functions'] ?? array(),
+	),
+	'exclude-classes'   => array(
+		...getWpExcludedSymbols( 'exclude-wordpress-classes.json' ),
+		...$conf['exclude-classes'] ?? array(),
+	),
+	'exclude-functions' => array(
+		...getWpExcludedSymbols( 'exclude-wordpress-constants.json' ),
+		...$conf['exclude-constants'] ?? array(),
+	),
+
+	'expose-global-constants' => $conf['expose-global-constants'] ?? true,
+	'expose-global-classes'   => $conf['expose-global-classes'] ?? true,
+	'expose-global-functions' => $conf['expose-global-functions'] ?? true,
+
+	'expose-namespaces' => $conf['expose-namespaces'] ?? array(),
+	'expose-constants'  => $conf['expose-constants'] ?? array(),
+	'expose-classes'    => $conf['expose-classes'] ?? array(),
+	'expose-functions'  => $conf['expose-functions'] ?? array(),
 );

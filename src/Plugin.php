@@ -94,7 +94,7 @@ EOD
 			'-vvv',
 		);
 
-		$io->write( 'Running php-scoper on ' . $project_dir );
+		$io->write( 'Running php-scoper in ' . $project_dir );
 
 		if ( ! empty( $conf['config'] ) ) {
 			$scoper_inc_path = Path::join( $project_dir, $conf['config'] );
@@ -113,6 +113,10 @@ EOD
 				throw new \RuntimeException( 'No prefix specified in composer.json or could not determine from autoload configuration.' );
 			}
 
+			// Write $conf to temporary json file.
+			$temp_config_path = tempnam( sys_get_temp_dir(), 'scoper-config-' ) . '.json';
+			file_put_contents( $temp_config_path, json_encode( $conf ) );
+
 			static::execute_command(
 				array( ...$command, "--config=$scoper_inc_path" ),
 				cwd: $project_dir,
@@ -121,8 +125,12 @@ EOD
 					'SCOPER_PREFIX'       => $prefix,
 					'SCOPER_WORKDIR'      => $workdir,
 					'COMPOSER_VENDOR_DIR' => $vendor_dir,
+					'THIRD_PARTY_CONFIG'  => $temp_config_path,
 				),
 			);
+
+			// Remove temporary config file.
+			unlink( $temp_config_path );
 		}
 
 		$io->write( 'Generate "autoload_classmap.php"...' );

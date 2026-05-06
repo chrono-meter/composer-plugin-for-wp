@@ -11,7 +11,7 @@ A Composer plugin that automates PHP namespace prefixing for WordPress plugins u
         // dependencies...
     },
     "require-dev": {
-        "chrono-meter/composer-plugin-for-wp": "dev-master"
+        "chrono-meter/composer-plugin-for-wp": "*"
     },
     "config": {
         "vendor-dir": "third-party.tmp",
@@ -47,7 +47,26 @@ A Composer plugin that automates PHP namespace prefixing for WordPress plugins u
              *
              * @default this package's embedded "scoper.inc.php"
              */
-            "config": ""
+            "config": "",
+
+            /**
+             * Additional configurations.
+             *
+             * @link https://github.com/humbug/php-scoper/blob/main/docs/configuration.md
+             */
+            "exclude-files": [],
+            "exclude-namespaces": [],
+            "exclude-constants": [],
+            "exclude-classes": [],
+            // https://github.com/humbug/php-scoper/issues/1131
+            "exclude-functions": [],
+            "expose-global-constants": true,
+            "expose-global-classes": true,
+            "expose-global-functions": true,
+            "expose-namespaces": [],
+            "expose-constants": [],
+            "expose-classes": [],
+            "expose-functions": [],
         }
     }
 }
