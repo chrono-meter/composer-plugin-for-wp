@@ -1,5 +1,6 @@
-<?php  // phpcs:ignore
+<?php
 namespace ChronoMeter\ComposerPluginForWp;
+
 use Composer\Composer;
 use Composer\Config;
 use Composer\IO\IOInterface;
@@ -8,8 +9,6 @@ use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Script\Event;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Filesystem\Filesystem;
-
-// phpcs:disable Squiz.Commenting, Squiz.PHP.CommentedOutCode, Universal.Operators.DisallowShortTernary.Found, WordPress
 
 
 class Plugin implements PluginInterface, EventSubscriberInterface {
@@ -26,7 +25,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 	public static function getSubscribedEvents() {
 		return array(
 			'post-install-cmd' => 'run',
-			'post-update-cmd' => 'run',
+			'post-update-cmd'  => 'run',
 		);
 	}
 
@@ -39,7 +38,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 		$conf       = $composer->getPackage()->getExtra()['scoper'] ?? array();
 
 		$project_dir = $composer->getConfig()->get( 'vendor-dir' );
-		if (str_ends_with( $project_dir, '/' . $vendor_dir )) {
+		if ( str_ends_with( $project_dir, '/' . $vendor_dir ) ) {
 			$project_dir = substr( $project_dir, 0, -strlen( '/' . $vendor_dir ) );
 		} else {
 			throw new \RuntimeException( 'Failed to determine project directory.' );
@@ -97,7 +96,7 @@ EOD
 
 		$io->write( 'Running php-scoper on ' . $project_dir );
 
-		if ( !empty( $conf['config'] ) ) {
+		if ( ! empty( $conf['config'] ) ) {
 			$scoper_inc_path = Path::join( $project_dir, $conf['config'] );
 			static::execute_command( array( ...$command, "--config=$scoper_inc_path" ), cwd: $project_dir );
 
@@ -119,8 +118,8 @@ EOD
 				cwd: $project_dir,
 				env_vars: array(
 					...getenv(),
-					'SCOPER_PREFIX' => $prefix,
-					'SCOPER_WORKDIR' => $workdir,
+					'SCOPER_PREFIX'       => $prefix,
+					'SCOPER_WORKDIR'      => $workdir,
 					'COMPOSER_VENDOR_DIR' => $vendor_dir,
 				),
 			);
@@ -156,7 +155,7 @@ EOD
 
 		$return_var = proc_close( $process );
 
-		if ( $return_var !== 0 ) {
+		if ( 0 !== $return_var ) {
 			throw new \RuntimeException( "Command failed with exit code $return_var: " . ( is_array( $command ) ? implode( ' ', $command ) : $command ) );
 		}
 	}

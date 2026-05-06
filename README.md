@@ -62,5 +62,31 @@ COMPOSER=third-party.json composer update
 Then load:
 
 ```php
-require_once __DIR__ . '/third-party/vendor/autoload.php';
+( function () {
+	/**
+	 * Autoload third-party classes.
+	 */
+	// Method 1. Use composer's autoloader.
+	// require_once __DIR__ . '/third-party/vendor/autoload.php';
+
+	// Method 2. Use own autoloader.
+	spl_autoload_register(
+		function ( string $klass ) {
+			static $class_map = ( @include __DIR__ . '/third-party/vendor/composer/autoload_classmap.php' ) ?: array();  // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, Universal.Operators.DisallowShortTernary.Found
+			if ( isset( $class_map[ $klass ] ) ) {
+				require_once $class_map[ $klass ];
+
+				return true;
+			}
+		},
+		prepend: true
+	);
+
+	/**
+	 * Load third-party files.
+	 */
+	foreach ( ( @include __DIR__ . '/third-party/composer/autoload_files.php' ) ?: array() as $file ) {  // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, Universal.Operators.DisallowShortTernary.Found
+		require_once $file;
+	}
+} )();
 ```

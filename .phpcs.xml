@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!-- https://github.com/squizlabs/PHP_CodeSniffer/wiki/Advanced-Usage#using-a-default-configuration-file -->
+<!-- https://github.com/WordPress/wordpress-develop/blob/trunk/phpcs.xml.dist -->
+
+<ruleset>
+	<arg name="extensions" value="php"/>
+	<arg name="basepath" value="./"/>
+	<arg value="ps"/>
+
+	<file>.</file>
+	<exclude-pattern type="relative">^build/*</exclude-pattern>
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+	<exclude-pattern>/vendor/*</exclude-pattern>
+	<exclude-pattern>/third-party/*</exclude-pattern>
+	<exclude-pattern>/third-party.tmp/*</exclude-pattern>
+
+	<rule ref="WordPress"/>
+
+	<rule ref="Generic.Files.LineEndings.InvalidEOLChar"><severity>0</severity></rule>
+	<rule ref="Squiz.Commenting"><severity>0</severity></rule>
+	<rule ref="Squiz.PHP.CommentedOutCode"><severity>0</severity></rule>
+	<rule ref="WordPress.Files.FileName"><severity>0</severity></rule>
+	<rule ref="WordPress.NamingConventions"><severity>0</severity></rule>
+	<rule ref="WordPress.WP.AlternativeFunctions"><severity>0</severity></rule>
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions"><severity>0</severity></rule>
+	<rule ref="WordPress.Security.EscapeOutput.ExceptionNotEscaped"><severity>0</severity></rule>
+	<rule ref="Generic.Commenting"><type>warning</type></rule>
+	<rule ref="Generic.Commenting.Todo.TaskFound"><severity>0</severity></rule>
+</ruleset>
