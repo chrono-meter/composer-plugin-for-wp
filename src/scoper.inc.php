@@ -99,11 +99,12 @@ $conf = json_decode( file_get_contents( getenv( 'THIRD_PARTY_CONFIG' ) ), true )
 
 
 // https://github.com/humbug/php-scoper/blob/main/docs/configuration.md
-return array(
+$conf = array(
 	'prefix'            => getenv( 'SCOPER_PREFIX' ),
 	'finders'           => array(
 		FinderWithNoRealPath::create()
 			->files()
+			->name( '*.php' )
 			->in( array( getenv( 'COMPOSER_VENDOR_DIR' ), ...getComposerInstalledPackageDirs() ) )
 			->ignoreVCS( true ),
 	),
@@ -111,7 +112,7 @@ return array(
 	'exclude-files' => $conf['exclude-files'] ?? array(),
 	'exclude-namespaces' => $conf['exclude-namespaces'] ?? array(),
 	'exclude-constants' => array(
-		...getWpExcludedSymbols( 'exclude-wordpress-functions.json' ),
+		...getWpExcludedSymbols( 'exclude-wordpress-constants.json' ),
 		...$conf['exclude-functions'] ?? array(),
 	),
 	'exclude-classes'   => array(
@@ -119,7 +120,7 @@ return array(
 		...$conf['exclude-classes'] ?? array(),
 	),
 	'exclude-functions' => array(
-		...getWpExcludedSymbols( 'exclude-wordpress-constants.json' ),
+		...getWpExcludedSymbols( 'exclude-wordpress-functions.json' ),
 		...$conf['exclude-constants'] ?? array(),
 	),
 
@@ -132,3 +133,5 @@ return array(
 	'expose-classes'    => $conf['expose-classes'] ?? array(),
 	'expose-functions'  => $conf['expose-functions'] ?? array(),
 );
+
+return $conf;
